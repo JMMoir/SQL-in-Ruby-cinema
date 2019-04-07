@@ -23,8 +23,8 @@ class Film
       )
       RETURNING id"
       values = [@title, @price]
-      user = Sqlrunner.run(sql, values)[0]
-      @id = user['id'].to_i
+      film = Sqlrunner.run(sql, values)[0]
+      @id = film['id'].to_i
   end
 
   def Film.all()
@@ -50,6 +50,7 @@ class Film
     Sqlrunner.run(sql, values)
   end
 
+### See which customers are going to see each film
   def customers()
     sql = "SELECT customers.* FROM customers INNER JOIN tickets ON customers.id = tickets.customer_id WHERE tickets.film_id = $1"
     values = [@id]
@@ -57,11 +58,19 @@ class Film
     return result.map { |customer| Customer.new(customer)  }
   end
 
+### Check to see how many customer are going to watch a certain film
   def customers_count()
       sql = "SELECT customers.* FROM customers INNER JOIN tickets ON customers.id = tickets.customer_id WHERE tickets.film_id = $1"
       values = [@id]
       result = Sqlrunner.run(sql, values)
       return result.count()
+  end
+
+  def most_popular_start_time()
+    sql = "SELECT COUNT(screenings.film_id), screenings.start_time FROM screenings INNER JOIN tickets ON screenings.id =tickets.screening_id WHERE screenings.film_id = $1 GROUP BY screenings.start_time ORDER BY screenings.start_time DESC LIMIT 1"
+    value = [@id]
+    return Sqlrunner.run(sql, value)[0]['start_time']
+
   end
 
 end

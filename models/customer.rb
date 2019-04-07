@@ -4,12 +4,13 @@ require_relative('film')
 class Customer
 
   attr_reader :id
-  attr_accessor :name, :cash
+  attr_accessor :name, :cash, :tickets
 
   def initialize(options)
     @id = options['id'].to_i if options['id']
     @name = options['name']
     @cash = options['cash'].to_i
+    @tickets = []
   end
 
   def save()
@@ -23,8 +24,8 @@ class Customer
       )
       RETURNING id"
       values = [@name, @cash]
-      user = Sqlrunner.run(sql, values)[0]
-      @id = user['id'].to_i
+      customer = Sqlrunner.run(sql, values)[0]
+      @id = customer['id'].to_i
   end
 
   def Customer.all()
@@ -77,11 +78,19 @@ class Customer
   def charge_for_ticket(price)
     @cash -= price
   end
+
+
 #### pull methods together to make purchase
   def buy_ticket(film)
     get_price = ticket_price(film)
     charge_for_ticket(get_price)
+    @tickets << film
     update()
+  end
+
+  ### Check to see how many tickets were bought by customer
+  def count_tickets
+    return @tickets.length()
   end
 
 end
