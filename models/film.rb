@@ -70,7 +70,6 @@ class Film
     sql = "SELECT COUNT(screenings.film_id), screenings.start_time FROM screenings INNER JOIN tickets ON screenings.id =tickets.screening_id WHERE screenings.film_id = $1 GROUP BY screenings.start_time ORDER BY screenings.start_time DESC LIMIT 1"
     value = [@id]
     return Sqlrunner.run(sql, value)[0]['start_time']
-
   end
 
 end
